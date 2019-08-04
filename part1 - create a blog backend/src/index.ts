@@ -4,6 +4,7 @@ import { ApplicationDependencies } from './interface'
 import { ServiceConfig } from './config'
 import { User } from './models/User.schema'
 import { Post } from './models/Post.schema'
+import { PostService, UserService } from '@Service'
 
 Object.values(ApplicationDependencies).forEach(connectionMgr =>
   connectionMgr.connect(),
@@ -11,8 +12,19 @@ Object.values(ApplicationDependencies).forEach(connectionMgr =>
 
 const typeDefs = gql`
   type Query {
+    posts(filter: PostFilterInput!): [Post!]!
     post(id: ID!): Post!
     user(id: ID!): User!
+  }
+
+  input PostFilterInput {
+    author: String
+    pagination: PaginationInput!
+  }
+
+  input PaginationInput {
+    page: Int
+    limit: Int
   }
 
   type Mutation {
@@ -40,8 +52,9 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    post: (_root, { id }, _context) => Post.findById(id),
-    user: (_root, { id }, _context) => User.findById(id),
+    posts: (_root, { filter }, _context) => PostService.getPosts(filter),
+    post: (_root, { id }, _context) => PostService.findById(id),
+    user: (_root, { id }, _context) => UserService.findById(id),
   },
   Mutation: {
     addUser: (_root, { firstName, lastName }, _context) => {
@@ -63,10 +76,11 @@ const server = new ApolloServer({
   resolvers,
 })
 
-server.listen({ port: ServiceConfig.port }).then(() => {
-  logger.info(
-    `${ServiceConfig.label} listening on port ${ServiceConfig.host}:${
-      ServiceConfig.port
-    }!`,
-  )
-})
+server
+  .listen({ port: ServiceConfig.port })
+  .then(({ url, subscriptionsUrl }) => {
+    logger.info(`🚀  ${ServiceConfig.label} Server ready at ${url}`)
+    logger.info(
+      `🚀  ${ServiceConfig.label} Subscriptions ready at ${subscriptionsUrl}`,
+    )
+  })

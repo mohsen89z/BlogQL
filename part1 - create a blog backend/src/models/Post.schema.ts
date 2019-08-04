@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose'
-
+import { IPost } from '@Types'
 const PostSchema = new mongoose.Schema(
   {
     author: {
@@ -9,6 +9,7 @@ const PostSchema = new mongoose.Schema(
     },
     title: String,
     content: String,
+    tags: [String],
   },
   {
     timestamps: true,
@@ -21,4 +22,4 @@ const PostSchema = new mongoose.Schema(
   },
 )
 
-export const Post = mongoose.model('Post', PostSchema)
+export const Post = mongoose.model<IPost>('Post', PostSchema)
