@@ -28,7 +28,7 @@
     "typescript": "^3.3.4000"
   },
   "dependencies": {
-    "apollo-server": "^2.4.8",
+    "apollo-server": "^2.14.2",
     "bluebird": "^3.5.4",
     "dotenv": "^7.0.0",
     "graphql": "^14.2.0",
